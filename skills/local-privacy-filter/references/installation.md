@@ -1,5 +1,22 @@
 # Installation and runtime
 
+## Install for Codex or Claude Code
+
+From the extracted repository folder, double-click **Install Skill.command** for Codex or **Install Claude Code Skill.command** for Claude Code. These copy the complete source skill before downloading its runtime.
+
+Equivalent terminal commands:
+
+```sh
+zsh scripts/install-skill.sh --agent codex
+zsh scripts/install-skill.sh --agent claude
+```
+
+Codex defaults to `${CODEX_HOME:-$HOME/.codex}/skills/local-privacy-filter`. Claude Code defaults to `~/.claude/skills/local-privacy-filter`. `--skills-dir DIRECTORY` overrides the destination parent for either agent; it can be combined with `--agent` when a custom location is needed. An existing skill is moved to a backup folder before installing a fresh source copy.
+
+Start a new Codex chat and ask `Use $local-privacy-filter to set up and open the local privacy filter on this Mac.` In a local Claude Code session, enter `/local-privacy-filter Set up and open the local privacy filter on this Mac.` Claude Code's [skills documentation](https://code.claude.com/docs/en/skills) describes discovery and invocation. Actual Claude Code session behavior has not yet been tested for this package.
+
+For Claude web or Desktop chat, run the standalone app on your Mac and upload only a reviewed filtered copy. Uploading this skill does not provide the Mac's local runtime to a cloud session. Neither agent installation automatically redacts all chat messages or file reads.
+
 ## Paths and prerequisites
 
 Commands below run from the skill directory containing `SKILL.md`. Helpers resolve `assets/app` relative to their own location, and accept `--app-dir` for an explicitly chosen app copy. Do not depend on the chat's current directory.

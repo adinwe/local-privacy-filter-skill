@@ -52,7 +52,7 @@ Only decode and save after a valid successful response. The server returns no or
 
 ## Local file client example
 
-Use this pattern in a local script when the user asks Codex to create a filtered file directly. Run it with the app's Python after verifying the service. Replace the fictional paths with authorized local paths; never print or attach the input bytes.
+Use this pattern in a local script when the user asks Codex or a local Claude Code session to create a filtered file directly. Run it with the app's Python after verifying the service. Replace the fictional paths with authorized local paths; never print or attach the input bytes.
 
 ```python
 import base64

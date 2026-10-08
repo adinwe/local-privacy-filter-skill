@@ -1,6 +1,6 @@
 # Local Privacy Filter
 
-A Codex skill and local browser app for filtering identifying details from **English text, CSV, Excel, Word and PDF files**. Scanned PDFs can use local OCR. You review the filtered copy before sharing it.
+A skill for **Codex and Claude Code**, plus a local browser app for filtering identifying details from **English text, CSV, Excel, Word and PDF files**. Scanned PDFs can use local OCR. You review the filtered copy before sharing it.
 
 The app combines GLiNER2 PII detection and Microsoft Presidio. It runs on your Mac without a separate chat model. This repository contains source code; the first setup downloads the pinned public model and dependencies. Later filtering runs offline.
 
@@ -16,11 +16,33 @@ The app combines GLiNER2 PII detection and Microsoft Presidio. It runs on your M
 
 You can also ask Codex's skill installer to install the `skills/local-privacy-filter` folder from [this repository](https://github.com/adinwe/local-privacy-filter-skill). Install the skill into its final location **before** setting up its runtime. Moving a configured folder can break its local Python environment. Preserve that folder, install a fresh source copy in its final location, then set it up again.
 
+## Install the Claude Code skill
+
+1. Download this repository as a ZIP from GitHub and extract it.
+2. Double-click **Install Claude Code Skill.command**. It copies the same skill to `~/.claude/skills/local-privacy-filter` and preserves any previous copy in a backup folder; it does not install the large runtime yet.
+3. Open a local Claude Code session on your Mac, then enter:
+
+   ```text
+   /local-privacy-filter Set up and open the local privacy filter on this Mac.
+   ```
+
+4. Let setup finish, then use the local browser app to filter and review your text or files.
+
+For a terminal installation, run this from the extracted repository folder:
+
+```sh
+zsh scripts/install-skill.sh --agent claude
+```
+
+Claude Code supports this [skill format and personal installation location](https://code.claude.com/docs/en/skills). The package's installation and relative paths have been checked; use inside an actual Claude Code session has not yet been tested. The Codex UI metadata in `agents/openai.yaml` is separate from the shared skill and application.
+
+This setup is for **local Claude Code sessions on the supported Mac**. Claude web, Desktop chat and cloud sessions do not run this Mac application through an uploaded skill. Use the browser app yourself, review the filtered copy, then upload only that copy to Claude. Claude's chat code execution runs in an [isolated environment on Anthropic's infrastructure](https://support.claude.com/en/articles/12111783-create-and-edit-files-with-claude).
+
 ## Use the browser app directly
 
-If you do not use Codex, keep the extracted repository in a folder where it will stay. Double-click **Setup.command** once, then **Privacy Filter.command** to open the app. Keep the Terminal window open while filtering; **Control+C** stops it. Nothing starts at login.
+If you prefer to run the app directly, keep the extracted repository in a folder where it will stay. Double-click **Setup.command** once, then **Privacy Filter.command** to open the app. Keep the Terminal window open while filtering; **Control+C** stops it. Nothing starts at login.
 
-First setup needs internet access, the `uv` package manager, and room for downloads. The setup message explains any missing prerequisite. Scanned-PDF support also needs Poppler and Tesseract with English recognition data; Codex can set up those optional tools through an existing Homebrew installation when requested.
+First setup needs internet access, the `uv` package manager, and room for downloads. The setup message explains any missing prerequisite. Scanned-PDF support also needs Poppler and Tesseract with English recognition data; Codex or Claude Code can set up those optional tools through an existing Homebrew installation when requested.
 
 ## What to use it for
 
@@ -66,6 +88,8 @@ Setup uses managed Python **3.12** through `uv`, so it does not depend on macOS'
 ## Local processing and integration
 
 The server listens only on `127.0.0.1`. The app has no external scripts, fonts, analytics or browser storage, and request access logs are disabled. Inputs and prepared outputs are handled in memory; copying uses the system clipboard and an explicit download saves a filtered copy. This does not promise secure memory erasure.
+
+The skill lets an agent set up and run the local app; it does **not** automatically intercept or redact every Codex or Claude message or file read. Keep confidential source text out of chats and agent tool output. Pass a local file path to the filter, or choose the file in its browser interface, and share only a reviewed filtered copy.
 
 Applications can use the [local API](skills/local-privacy-filter/references/api.md) before sending a request to Jev, Laya or another service. These integrations are not configured automatically. A client must stop on filtering failure and forward only a reviewed result.
 

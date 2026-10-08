@@ -1,4 +1,16 @@
-# Release verification — v1.0.0
+# Release verification
+
+## v1.0.1 — Codex and Claude Code installation
+
+The same source skill is packaged for local Codex and Claude Code sessions. The added Claude Code launcher selects its personal skill directory; the existing Codex launcher and custom destination option remain available.
+
+- Both agent installers copied exactly 31 source skill files into isolated directories with spaces; backups preserved the previous installation, and executable permissions were retained.
+- Nine invalid argument cases returned errors before creating files. Help, custom destination overrides, flag order, default destination selection and launcher syntax were checked without changing actual user skill folders.
+- No model weights, environments or caches were copied. Skill validation and documentation reference checks passed, and independent review found no release blocker.
+
+The local filter application, pinned dependencies, model downloads and seven fictional input files are unchanged from v1.0.0. The application evidence below remains applicable. Actual use inside a Claude Code session and a complete first-time installation on a fresh Mac have not been tested.
+
+## v1.0.0 — application and setup verification
 
 Verified on 8 October 2026 for macOS Apple Silicon.
 

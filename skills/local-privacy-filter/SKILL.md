@@ -7,6 +7,12 @@ description: "Set up and use the local English privacy filter on macOS Apple Sil
 
 Use the bundled local app to prepare reviewed copies of English text or CSV, XLSX, DOCX and PDF files. Detection combines GLiNER2 and Presidio; scanned PDFs can use local Poppler/Tesseract OCR. It does not need a separate chat model.
 
+## Agent compatibility
+
+Use this skill in a local Codex or Claude Code session on the supported Mac. Codex uses `$local-privacy-filter`; Claude Code uses `/local-privacy-filter`. The shared scripts resolve their bundled app relative to this installed skill. `agents/openai.yaml` supplies Codex UI metadata only.
+
+Do not try to install this Mac runtime in a Claude chat, Cowork or cloud execution environment. Those users can run the standalone local browser app themselves and share only a reviewed filtered copy. This skill does not intercept every agent message or file read automatically.
+
 ## Setup and opening
 
 Resolve all paths from this skill's installed directory. The app is in `assets/app`; helper scripts default to that app directory. Keep the installed skill in its final location before building its environment.
