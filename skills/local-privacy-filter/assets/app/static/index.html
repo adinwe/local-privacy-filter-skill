@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <title>Local Privacy Filter</title>
+  <style nonce="{{NONCE}}">
+    :root { color-scheme: light; --ink: #18322a; --muted: #67756d; --line: #d8e0d8; --paper: #fbfcf8; --accent: #28583f; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #f1f4ed; color: var(--ink); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; line-height: 1.5; }
+    main { max-width: 1160px; margin: 0 auto; padding: 52px 32px 32px; }
+    header { display: flex; align-items: start; justify-content: space-between; gap: 24px; margin-bottom: 30px; }
+    .eyebrow { color: var(--muted); font-size: 12px; font-weight: 650; letter-spacing: .12em; text-transform: uppercase; margin: 0 0 10px; }
+    h1 { margin: 0; font-size: clamp(29px, 4vw, 42px); letter-spacing: -.035em; font-weight: 650; line-height: 1.15; }
+    .intro { color: var(--muted); margin: 12px 0 0; max-width: 580px; }
+    .badge { white-space: nowrap; margin-top: 4px; border: 1px solid #c4d5c5; border-radius: 99px; padding: 8px 13px; font-size: 12px; background: #e7eee4; color: #34563c; }
+    .panels { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+    .panel { background: var(--paper); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; box-shadow: 0 2px 3px #18322a05; }
+    .panel-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 18px 20px; border-bottom: 1px solid var(--line); }
+    .panel-title { font-weight: 650; font-size: 15px; }
+    .step { display: inline-flex; align-items: center; justify-content: center; width: 25px; height: 25px; margin-right: 8px; border: 1px solid #ccd7ca; border-radius: 50%; color: #60705e; font-size: 12px; }
+    .small { font-size: 12px; color: var(--muted); }
+    textarea { display: block; width: 100%; min-height: 390px; resize: vertical; border: 0; outline: none; padding: 22px; background: transparent; color: var(--ink); font: inherit; line-height: 1.65; }
+    textarea::placeholder { color: #89958b; }
+    textarea:focus { box-shadow: inset 0 0 0 2px #7d9c7b; }
+    textarea:disabled { opacity: .75; }
+    #output { background: #f5f8f1; }
+    .actions { display: flex; gap: 10px; justify-content: space-between; align-items: center; padding: 15px 20px; border-top: 1px solid var(--line); min-height: 72px; }
+    .button-group { display: flex; gap: 9px; }
+    button { cursor: pointer; font: inherit; font-size: 14px; font-weight: 600; border: 1px solid #cdd8cb; border-radius: 8px; background: transparent; padding: 10px 15px; color: var(--ink); }
+    button.primary { background: var(--accent); color: #fff; border-color: var(--accent); padding-left: 20px; padding-right: 20px; }
+    button:hover:enabled { filter: brightness(.95); }
+    button:focus-visible { outline: 3px solid #91aa8e; outline-offset: 3px; }
+    button:disabled { opacity: .45; cursor: default; }
+    .status { min-height: 26px; margin: 19px 1px 0; font-size: 14px; color: var(--muted); }
+    .status.error { color: #9c352e; }
+    .review { margin: 18px 0 0; padding: 14px 18px; border-left: 3px solid #89a384; background: #e9efe3; border-radius: 0 8px 8px 0; font-size: 14px; }
+    .document-panel { margin-top: 24px; }
+    .file-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; padding: 22px; }
+    .file-label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 12px; }
+    input[type=file] { max-width: 100%; font: inherit; font-size: 13px; color: var(--muted); }
+    input[type=file]::file-selector-button { margin-right: 12px; border: 1px solid #cdd8cb; border-radius: 8px; background: #eef2e9; padding: 10px 13px; color: var(--ink); font: inherit; cursor: pointer; }
+    input[type=file]:focus-visible { outline: 3px solid #91aa8e; outline-offset: 3px; }
+    .file-help { color: var(--muted); font-size: 13px; margin: 12px 0 16px; }
+    .file-result { background: #f5f8f1; border: 1px solid #dfe6dc; border-radius: 10px; padding: 16px; }
+    .file-result p { margin-top: 0; }
+    .file-result ul { font-size: 13px; color: var(--muted); padding-left: 18px; margin-bottom: 16px; }
+    .file-result li + li { margin-top: 7px; }
+    .file-status { margin-bottom: 0; }
+    .download-review { margin: 12px 0 0; }
+    h2.panel-title { margin: 0; }
+    footer { color: var(--muted); font-size: 12px; margin-top: 22px; }
+    @media (max-width: 760px) { main { padding: 28px 18px; } header { display: block; } .badge { display: inline-block; margin-top: 18px; } .panels, .file-grid { grid-template-columns: 1fr; gap: 18px; } textarea { min-height: 260px; } .panel-head, .actions { padding-left: 16px; padding-right: 16px; } .file-grid { padding: 16px; } }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <div>
+      <p class="eyebrow">Review before you share</p>
+      <h1>Local Privacy Filter</h1>
+      <p class="intro">Remove identifying details from English text and files on this Mac. You decide what to copy, download and share.</p>
+    </div>
+    <span class="badge">Local · English</span>
+  </header>
+  <div class="panels">
+    <section class="panel" aria-labelledby="input-label">
+      <div class="panel-head">
+        <label class="panel-title" id="input-label" for="input"><span class="step" aria-hidden="true">1</span>Paste your text</label>
+        <span class="small" id="counter">0 / 100,000</span>
+      </div>
+      <textarea id="input" placeholder="Paste a note, message or document excerpt…" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" data-gramm="false" data-enable-grammarly="false"></textarea>
+      <div class="actions">
+        <div class="button-group">
+          <button class="primary" id="redact" disabled>Redact text</button>
+          <button id="clear">Clear</button>
+        </div>
+        <span class="small">Up to 100,000 characters</span>
+      </div>
+    </section>
+    <section class="panel" aria-labelledby="output-label">
+      <div class="panel-head">
+        <label class="panel-title" id="output-label" for="output"><span class="step" aria-hidden="true">2</span>Review the result</label>
+        <span class="small" id="result-count">Ready when you are</span>
+      </div>
+      <textarea id="output" placeholder="Your redacted text appears here." readonly autocomplete="off" spellcheck="false" data-gramm="false" data-enable-grammarly="false"></textarea>
+      <div class="actions">
+        <span class="small" id="summary">Read through the result before copying.</span>
+        <button id="copy" disabled>Copy result</button>
+      </div>
+    </section>
+  </div>
+  <p class="status" id="status" role="status" aria-live="polite"></p>
+  <section class="document-panel panel" aria-labelledby="file-heading">
+    <div class="panel-head">
+      <h2 class="panel-title" id="file-heading">Or filter a file</h2>
+      <span class="small">Your original stays unchanged</span>
+    </div>
+    <div class="file-grid">
+      <div>
+        <label class="file-label" for="file-input">Choose a document or spreadsheet</label>
+        <input id="file-input" type="file" accept=".csv,.xlsx,.docx,.pdf" aria-describedby="file-help">
+        <p class="file-help" id="file-help">CSV, Excel (.xlsx), Word (.docx) and PDF · up to 20 MB. Copies simplify formatting and omit non-text content.</p>
+        <div class="button-group">
+          <button class="primary" id="filter-file" disabled>Filter file</button>
+          <button id="clear-file">Clear file</button>
+        </div>
+        <p class="status file-status" id="file-status" role="status" aria-live="polite"></p>
+      </div>
+      <div class="file-result">
+        <p id="file-summary">Choose a file to prepare a filtered copy.</p>
+        <ul id="file-warnings" aria-label="File review notes"></ul>
+        <button id="download-file" disabled>Download filtered copy</button>
+        <p class="small download-review">Open the downloaded copy and check it before sharing. Scanned PDFs use local text recognition and may need extra review.</p>
+      </div>
+    </div>
+  </section>
+  <p class="review">Check the result before sharing; automated detection can miss identifying details.</p>
+  <footer>Processing stays on this Mac. This app does not save your input or send results to another service. A filtered copy is saved only when you choose to download it.</footer>
+</main>
+<script nonce="{{NONCE}}">
+  "use strict";
+  const input = document.getElementById("input");
+  const output = document.getElementById("output");
+  const redactButton = document.getElementById("redact");
+  const clearButton = document.getElementById("clear");
+  const copyButton = document.getElementById("copy");
+  const counter = document.getElementById("counter");
+  const resultCount = document.getElementById("result-count");
+  const summary = document.getElementById("summary");
+  const status = document.getElementById("status");
+  const fileInput = document.getElementById("file-input");
+  const fileButton = document.getElementById("filter-file");
+  const fileClearButton = document.getElementById("clear-file");
+  const downloadButton = document.getElementById("download-file");
+  const fileSummary = document.getElementById("file-summary");
+  const fileWarnings = document.getElementById("file-warnings");
+  const fileStatus = document.getElementById("file-status");
+  const MAX_CHARS = 100000;
+  const MAX_FILE_BYTES = 20 * 1024 * 1024;
+  const FILE_EXTENSIONS = new Set(["csv", "xlsx", "docx", "pdf"]);
+  let pending = null;
+  let activeKind = null;
+  let generation = 0;
+  let downloadUrl = null;
+  let downloadExtension = null;
+
+  function setStatus(message, error = false) {
+    status.textContent = message;
+    status.classList.toggle("error", error);
+  }
+  function resetResult() {
+    output.value = "";
+    copyButton.disabled = true;
+    resultCount.textContent = "Ready when you are";
+    summary.textContent = "Read through the result before copying.";
+  }
+  function setFileStatus(message, error = false) {
+    fileStatus.textContent = message;
+    fileStatus.classList.toggle("error", error);
+  }
+  function resetFileResult() {
+    if (downloadUrl !== null) URL.revokeObjectURL(downloadUrl);
+    downloadUrl = null;
+    downloadExtension = null;
+    downloadButton.disabled = true;
+    fileSummary.textContent = "Choose a file to prepare a filtered copy.";
+    fileWarnings.replaceChildren();
+  }
+  function selectedFile() {
+    const file = fileInput.files && fileInput.files[0];
+    if (!file) return null;
+    const extension = file.name.split(".").pop().toLowerCase();
+    return {file, extension};
+  }
+  function updateInput() {
+    // Match Python's Unicode character count, including characters outside BMP.
+    const length = Array.from(input.value).length;
+    counter.textContent = length.toLocaleString("en") + " / 100,000";
+    redactButton.disabled = Boolean(pending) || !input.value.trim() || length > MAX_CHARS;
+    const selection = selectedFile();
+    fileButton.disabled = Boolean(pending) || !selection || !FILE_EXTENSIONS.has(selection.extension) || selection.file.size > MAX_FILE_BYTES || selection.file.size === 0;
+    if (length > MAX_CHARS) setStatus("Use at most 100,000 characters at a time.", true);
+  }
+  function setBusy(busy) {
+    input.disabled = busy;
+    fileInput.disabled = busy;
+    fileClearButton.disabled = busy && activeKind === "text";
+    redactButton.textContent = busy && activeKind === "text" ? "Redacting…" : "Redact text";
+    fileButton.textContent = busy && activeKind === "file" ? "Filtering…" : "Filter file";
+    updateInput();
+  }
+  input.addEventListener("input", () => {
+    resetResult();
+    setStatus("");
+    updateInput();
+  });
+  clearButton.addEventListener("click", () => {
+    generation += 1;
+    if (pending) pending.abort();
+    pending = null;
+    activeKind = null;
+    input.value = "";
+    fileInput.value = "";
+    resetResult();
+    resetFileResult();
+    setBusy(false);
+    setStatus("Text and file cleared.");
+    setFileStatus("");
+    input.focus();
+  });
+  fileClearButton.addEventListener("click", () => {
+    if (activeKind === "text") return;
+    generation += 1;
+    if (pending) pending.abort();
+    pending = null;
+    activeKind = null;
+    fileInput.value = "";
+    resetFileResult();
+    setBusy(false);
+    setFileStatus("File cleared.");
+    fileInput.focus();
+  });
+  fileInput.addEventListener("change", () => {
+    generation += 1;
+    if (pending) pending.abort();
+    pending = null;
+    activeKind = null;
+    resetFileResult();
+    setBusy(false);
+    setFileStatus("");
+    const selection = selectedFile();
+    if (selection && !FILE_EXTENSIONS.has(selection.extension)) {
+      setFileStatus("Choose a CSV, Excel (.xlsx), Word (.docx) or PDF file.", true);
+    } else if (selection && selection.file.size > MAX_FILE_BYTES) {
+      setFileStatus("Choose a file of at most 20 MB.", true);
+    } else if (selection && selection.file.size === 0) {
+      setFileStatus("Choose a non-empty file.", true);
+    }
+    updateInput();
+  });
+  redactButton.addEventListener("click", async () => {
+    if (redactButton.disabled) return;
+    const requestGeneration = ++generation;
+    const controller = new AbortController();
+    pending = controller;
+    activeKind = "text";
+    resetResult();
+    resetFileResult();
+    setFileStatus("");
+    setBusy(true);
+    setStatus("Processing locally. Longer text may take a little time.");
+    try {
+      const response = await fetch("/redact", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({text: input.value}),
+        cache: "no-store",
+        signal: controller.signal
+      });
+      const data = await response.json();
+      if (requestGeneration !== generation) return;
+      if (!response.ok || typeof data.redacted_text !== "string") {
+        resetResult();
+        setStatus("Redaction could not finish. No result is available. Please try again.", true);
+        return;
+      }
+      output.value = data.redacted_text;
+      copyButton.disabled = !output.value;
+      const count = Number.isInteger(data.entity_count) ? data.entity_count : 0;
+      resultCount.textContent = count + (count === 1 ? " span redacted" : " spans redacted");
+      summary.textContent = count === 0 ? "No identifiers detected. Review carefully." : "Review the placeholders and surrounding text.";
+      setStatus(count === 0 ? "No identifiers were detected. Check the text carefully before sharing." : "Redaction finished. Review the result before sharing.");
+      output.focus();
+    } catch (error) {
+      if (requestGeneration !== generation || error.name === "AbortError") return;
+      resetResult();
+      setStatus("The local filter could not be reached. No result is available.", true);
+    } finally {
+      if (requestGeneration === generation) {
+        pending = null;
+        activeKind = null;
+        setBusy(false);
+      }
+    }
+  });
+  fileButton.addEventListener("click", async () => {
+    if (fileButton.disabled) return;
+    const selection = selectedFile();
+    if (!selection) return;
+    const requestGeneration = ++generation;
+    const controller = new AbortController();
+    pending = controller;
+    activeKind = "file";
+    resetResult();
+    resetFileResult();
+    setStatus("");
+    setBusy(true);
+    setFileStatus("Filtering locally. Scanned PDFs can take a few minutes.");
+    try {
+      const response = await fetch("/redact-file", {
+        method: "POST",
+        headers: {"Content-Type": "application/octet-stream", "X-File-Extension": selection.extension},
+        body: selection.file,
+        cache: "no-store",
+        signal: controller.signal
+      });
+      const data = await response.json();
+      if (requestGeneration !== generation) return;
+      if (!response.ok) {
+        resetFileResult();
+        setFileStatus(typeof data.error === "string" ? data.error : "File filtering could not finish. No result is available.", true);
+        return;
+      }
+      if (typeof data.content_base64 !== "string" || typeof data.media_type !== "string" || !FILE_EXTENSIONS.has(data.extension) || !Number.isInteger(data.entity_count) || !Number.isInteger(data.units)) {
+        throw new Error("Invalid filtered file");
+      }
+      const binary = atob(data.content_base64);
+      if (binary.length === 0 || binary.length > MAX_FILE_BYTES) throw new Error("Invalid filtered file size");
+      const bytes = new Uint8Array(binary.length);
+      for (let index = 0; index < binary.length; index += 1) bytes[index] = binary.charCodeAt(index);
+      downloadUrl = URL.createObjectURL(new Blob([bytes], {type: data.media_type}));
+      downloadExtension = data.extension;
+      downloadButton.disabled = false;
+      fileSummary.textContent = data.entity_count + (data.entity_count === 1 ? " identifying detail replaced" : " identifying details replaced") + " · " + data.units + (data.units === 1 ? " part checked." : " parts checked.");
+      if (Array.isArray(data.warnings)) {
+        for (const warning of data.warnings) {
+          if (typeof warning !== "string") continue;
+          const item = document.createElement("li");
+          item.textContent = warning;
+          fileWarnings.appendChild(item);
+        }
+      }
+      setFileStatus("Filtered copy ready. Download it to review before sharing.");
+      downloadButton.focus();
+    } catch (error) {
+      if (requestGeneration !== generation || error.name === "AbortError") return;
+      resetFileResult();
+      setFileStatus("File filtering could not finish. No result is available. Please try again.", true);
+    } finally {
+      if (requestGeneration === generation) {
+        pending = null;
+        activeKind = null;
+        setBusy(false);
+      }
+    }
+  });
+  downloadButton.addEventListener("click", () => {
+    if (!downloadUrl || !downloadExtension || downloadButton.disabled) return;
+    const link = document.createElement("a");
+    link.href = downloadUrl;
+    link.download = "redacted." + downloadExtension;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setFileStatus("Save the filtered copy, then open it to review before sharing.");
+  });
+  window.addEventListener("pagehide", resetFileResult);
+  copyButton.addEventListener("click", async () => {
+    if (!output.value) return;
+    try {
+      await navigator.clipboard.writeText(output.value);
+      setStatus("Redacted result copied.");
+    } catch (_) {
+      output.focus();
+      output.select();
+      setStatus("Press Command+C to copy the selected result.");
+    }
+  });
+</script>
+</body>
+</html>

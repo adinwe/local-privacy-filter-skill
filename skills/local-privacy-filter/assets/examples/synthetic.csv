@@ -1,0 +1,4 @@
+fixture,contact,email,phone,notes
+synthetic only,Jane Example,jane.example@example.com,0412 345678,"Quoted, comma; and
+multiline text."
+tail repeat,Jane Example,jane.example@example.com,0412 345678,TAIL SYNTHETIC REPEAT: Jane Example; jane.example@example.com; 0412 345678.

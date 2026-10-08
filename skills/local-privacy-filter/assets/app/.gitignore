@@ -1,0 +1,7 @@
+.venv/
+models/
+.setup-cache/
+.document-setup-cache/
+.runtime/
+__pycache__/
+*.pyc

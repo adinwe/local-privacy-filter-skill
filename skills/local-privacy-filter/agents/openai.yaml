@@ -1,0 +1,4 @@
+interface:
+  display_name: "Local Privacy Filter"
+  short_description: "Filter English text and files locally on your Mac"
+  default_prompt: "Use $local-privacy-filter to set up the local app and filter an English document for review."

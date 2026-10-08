@@ -1,0 +1,13 @@
+.DS_Store
+**/.venv/
+**/.python/
+**/models/
+**/.setup-cache/
+**/.document-setup-cache/
+**/.runtime/
+**/__pycache__/
+*.pyc
+.env
+.env.*
+dist/
+verification-local/
